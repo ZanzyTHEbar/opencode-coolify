@@ -57,19 +57,5 @@
   "permission": {
     "bash": "ask",
     "edit": "ask"
-  },
-  "opencode-mem": {
-    "storagePath": "/root/.opencode-mem/data",
-    "embeddingModel": "Xenova/nomic-embed-text-v1",
-    "webServerEnabled": true,
-    "webServerPort": 4747,
-    "autoCaptureEnabled": true,
-    "opencodeProvider": "opencode",
-    "opencodeModel": "claude-haiku-4-6",
-    "chatMessage": {
-      "enabled": true,
-      "maxMemories": 400,
-      "injectOn": "first"
-    }
   }
 }
