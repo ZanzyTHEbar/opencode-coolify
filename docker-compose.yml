@@ -1,0 +1,38 @@
+# OpenCode web server — standalone (Coolify destination_uuid not set).
+# Deploy on cool-res; Traefik (coolify-proxy) discovers via Docker labels.
+# Authentik: Proxy Provider "OpenCode Proxy" + forward auth middleware below.
+
+services:
+  opencode:
+    image: ghcr.io/anomalyco/opencode:latest
+    container_name: opencode-web
+    command: web --hostname 0.0.0.0 --port 4096
+    environment:
+      - OPENCODE_SERVER_PASSWORD=${OPENCODE_SERVER_PASSWORD:-}
+      - OPENCODE_SERVER_USERNAME=${OPENCODE_SERVER_USERNAME:-opencode}
+      - ANTHROPIC_API_KEY=${ANTHROPIC_API_KEY:-}
+      - OPENAI_API_KEY=${OPENAI_API_KEY:-}
+    volumes:
+      - opencode_config:/root/.config/opencode
+      - opencode_storage:/root/.local/share/opencode/storage
+      - opencode_mem:/root/.opencode-mem
+      - /mnt/shared/common:/workspaces:rw
+    ports:
+      - "4096:4096"
+      - "4747:4747"
+    restart: unless-stopped
+    labels:
+      - traefik.http.middlewares.opencode-auth.forwardauth.address=https://auth.zacariahheim.com/outpost.goauthentik.io/auth/traefik
+      - traefik.http.middlewares.opencode-auth.forwardauth.trustForwardHeader=true
+      - traefik.http.middlewares.opencode-auth.forwardauth.authResponseHeaders=X-authentik-username,X-authentik-groups,X-authentik-email,X-authentik-name,X-authentik-uid,X-authentik-jwt,X-authentik-meta-*
+    networks:
+      - coolify
+
+networks:
+  coolify:
+    external: true
+
+volumes:
+  opencode_config:
+  opencode_storage:
+  opencode_mem:

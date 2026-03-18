@@ -1,0 +1,28 @@
+# Project agent instructions (AGENTS.md)
+
+Copy this file to your project root as `AGENTS.md` (or merge into existing). OpenCode loads it via `instructions: ["AGENTS.md", ...]`.
+
+---
+
+## Stack and conventions
+
+- **Language / runtime:** (e.g. Go 1.22, Node 20, Python 3.11)
+- **Style:** (e.g. go fmt, Prettier, Black)
+- **Tests:** (e.g. go test ./..., npm test, pytest)
+- **Architecture:** (e.g. hexagonal, layered API + worker)
+
+## Code standards
+
+- Prefer guard clauses and early returns; avoid deep nesting.
+- Use interfaces for dependencies; inject via constructors.
+- Log with structured fields (e.g. zerolog/logrus); no sensitive data in logs.
+- Errors: wrap with context; use project error types or errbuilder-go where adopted.
+
+## Repo layout
+
+- (e.g. `cmd/` for entrypoints, `internal/` for non-imported code, `pkg/` for shared libraries)
+
+## Out of scope
+
+- Do not change CI/CD or infra without explicit request.
+- Do not commit secrets or .env; use .env.example as template.
