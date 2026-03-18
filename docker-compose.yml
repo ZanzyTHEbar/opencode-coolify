@@ -26,11 +26,6 @@ services:
       - traefik.http.middlewares.opencode-auth.forwardauth.address=https://auth.zacariahheim.com/outpost.goauthentik.io/auth/traefik
       - traefik.http.middlewares.opencode-auth.forwardauth.trustForwardHeader=true
       - traefik.http.middlewares.opencode-auth.forwardauth.authResponseHeaders=X-authentik-username,X-authentik-groups,X-authentik-email,X-authentik-name,X-authentik-uid,X-authentik-jwt,X-authentik-meta-*
-      # Higher-priority router: Authentik flow/outpost paths on app domain → Authentik (fixes MIME/404 for flow assets)
-      - traefik.http.routers.opencode-authentik.rule=Host(`opencode.zacariahheim.com`) && (PathPrefix(`/outpost.goauthentik.io/`) || PathPrefix(`/application/`) || PathPrefix(`/static/`))
-      - traefik.http.routers.opencode-authentik.priority=15
-      - traefik.http.routers.opencode-authentik.service=opencode-authentik-backend
-      - traefik.http.services.opencode-authentik-backend.loadbalancer.servers[0].url=https://auth.zacariahheim.com
     networks:
       - coolify
 
