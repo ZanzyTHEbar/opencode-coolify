@@ -1,0 +1,75 @@
+{
+  "$schema": "https://opencode.ai/config.json",
+  "autoupdate": true,
+  "enabled_providers": [
+    "opencode",
+    "opencode-go",
+    "github"
+  ],
+  "model": "opencode/kimi-k2.5",
+  "small_model": "opencode/claude-haiku-4-5",
+  "plugin": [
+    "opencode-mem"
+  ],
+  "instructions": [
+    "AGENTS.md",
+    "docs/guidelines.md",
+    ".cursor/rules/*.md"
+  ],
+  "compaction": {
+    "auto": true,
+    "prune": true,
+    "reserved": 50000
+  },
+  "watcher": {
+    "ignore": [
+      "node_modules/**",
+      "dist/**",
+      ".git/**",
+      "*.log"
+    ]
+  },
+  "snapshot": true,
+  "agent": {
+    "orchestrator": {
+      "mode": "primary",
+      "description": "Coordinates subagents for complex tasks",
+      "model": "opencode/claude-sonnet-4-6",
+      "permission": {
+        "task": {
+          "*": "ask",
+          "reviewer": "allow",
+          "explorer": "allow"
+        }
+      }
+    },
+    "reviewer": {
+      "mode": "subagent",
+      "description": "Security and performance review, read-only",
+      "model": "opencode/claude-haiku-4-6",
+      "permission": {
+        "edit": "deny",
+        "write": "deny",
+        "bash": "ask"
+      }
+    }
+  },
+  "permission": {
+    "bash": "ask",
+    "edit": "ask"
+  },
+  "opencode-mem": {
+    "storagePath": "/root/.opencode-mem/data",
+    "embeddingModel": "Xenova/nomic-embed-text-v1",
+    "webServerEnabled": true,
+    "webServerPort": 4747,
+    "autoCaptureEnabled": true,
+    "opencodeProvider": "opencode",
+    "opencodeModel": "claude-haiku-4-6",
+    "chatMessage": {
+      "enabled": true,
+      "maxMemories": 400,
+      "injectOn": "first"
+    }
+  }
+}
