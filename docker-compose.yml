@@ -2,6 +2,11 @@
 # Assign domain in Coolify (e.g. https://opencode.zacariahheim.com:4096).
 # When using Authentik, leave OPENCODE_SERVER_PASSWORD unset so the app doesn't
 # prompt for basic auth; Authentik protects at the proxy.
+#
+# Authentik path proxy: forward-auth redirects to the flow on the app host;
+# /if/, /static/, /Lw/, /outpost.goauthentik.io/ must be served by Authentik.
+# This service proxies those paths to auth.zacariahheim.com so the flow and
+# assets load instead of 404. Set OPENCODE_DOMAIN to match your Coolify-assigned domain (no port).
 
 services:
   opencode:
@@ -27,6 +32,24 @@ services:
       - traefik.http.middlewares.opencode-auth.forwardauth.trustForwardHeader=true
       - traefik.http.middlewares.opencode-auth.forwardauth.authResponseHeaders=X-authentik-username,X-authentik-groups,X-authentik-email,X-authentik-name,X-authentik-uid,X-authentik-jwt,X-authentik-meta-*
       - coolify.traefik.middlewares=opencode-auth@docker
+    networks:
+      - coolify
+
+  # Proxies Authentik flow/static/session paths so they are served from auth domain (fixes 404s).
+  authentik-path-proxy:
+    image: nginx:alpine
+    volumes:
+      - ./authentik-path-proxy.conf:/etc/nginx/conf.d/default.conf:ro
+    expose:
+      - "8080"
+    restart: unless-stopped
+    labels:
+      - traefik.enable=true
+      - traefik.http.services.authentik-path-proxy.loadbalancer.server.port=8080
+      # Match OpenCode host + Authentik paths; higher priority so these paths hit Authentik.
+      - traefik.http.routers.opencode-authentik-paths.rule=Host(`${OPENCODE_DOMAIN:-opencode.zacariahheim.com}`) && (PathPrefix(`/if/`) || PathPrefix(`/static/`) || PathPrefix(`/Lw/`) || PathPrefix(`/outpost.goauthentik.io/`))
+      - traefik.http.routers.opencode-authentik-paths.priority=100
+      - traefik.http.routers.opencode-authentik-paths.service=authentik-path-proxy
     networks:
       - coolify
 
