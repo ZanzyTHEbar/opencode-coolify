@@ -46,9 +46,9 @@ services:
     labels:
       - traefik.enable=true
       - traefik.http.services.authentik-path-proxy.loadbalancer.server.port=8080
-      # Match OpenCode host + Authentik paths; higher priority so these paths hit Authentik.
-      - traefik.http.routers.opencode-authentik-paths.rule=Host(`${OPENCODE_DOMAIN:-opencode.zacariahheim.com}`) && (PathPrefix(`/if/`) || PathPrefix(`/static/`) || PathPrefix(`/Lw/`) || PathPrefix(`/outpost.goauthentik.io/`))
-      - traefik.http.routers.opencode-authentik-paths.priority=100
+      # Match OpenCode host (with or without port) + Authentik paths; priority 10000 so this wins over Coolify's app router.
+      - traefik.http.routers.opencode-authentik-paths.rule=(Host(`${OPENCODE_DOMAIN:-opencode.zacariahheim.com}`) || Host(`opencode.zacariahheim.com:4096`)) && (PathPrefix(`/if/`) || PathPrefix(`/static/`) || PathPrefix(`/Lw/`) || PathPrefix(`/outpost.goauthentik.io/`))
+      - traefik.http.routers.opencode-authentik-paths.priority=10000
       - traefik.http.routers.opencode-authentik-paths.service=authentik-path-proxy
     networks:
       - coolify
